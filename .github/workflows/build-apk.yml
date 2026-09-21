@@ -76,7 +76,7 @@ jobs:
 
       - name: Debug Nitro server
         run: |
-          NITRO_HOST=127.0.0.1 NITRO_PORT=3000 NODE_ENV=development node .output/server/index.mjs > /tmp/nitro.log 2>&1 &
+          NITRO_HOST=127.0.0.1 NITRO_PORT=3000 NODE_ENV=development npx -y node@18 .output/server/index.mjs > /tmp/nitro.log 2>&1 &
           SERVER_PID=$!
           sleep 5
           echo "===== SERVER LOG ====="
