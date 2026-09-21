@@ -74,6 +74,19 @@ jobs:
           }
           PACKAGE
 
+      - name: Debug Nitro server
+        run: |
+          NITRO_HOST=127.0.0.1 NITRO_PORT=3000 NODE_ENV=development node .output/server/index.mjs > /tmp/nitro.log 2>&1 &
+          SERVER_PID=$!
+          sleep 5
+          echo "===== SERVER LOG ====="
+          cat /tmp/nitro.log || true
+          echo "===== HTTP RESPONSE ====="
+          curl -i --max-time 10 http://127.0.0.1:3000/ || true
+          echo "===== FINAL SERVER LOG ====="
+          cat /tmp/nitro.log || true
+          kill $SERVER_PID 2>/dev/null || true
+
       - name: Create web loader
         run: |
           cat > dist/index.html <<'HTML'
