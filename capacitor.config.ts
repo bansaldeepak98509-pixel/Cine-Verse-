@@ -6,6 +6,9 @@ const config: CapacitorConfig = {
   appId: 'com.cineverse.app',
   appName: 'CineVerse',
   webDir: 'dist',
+  android: {
+    allowMixedContent: true
+  },
   plugins: {
     Nodejs: {
       nodeDir: 'nodejs',
