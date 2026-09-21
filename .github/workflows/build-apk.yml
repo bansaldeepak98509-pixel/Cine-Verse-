@@ -20,8 +20,10 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Setup Android
-        uses: android-actions/setup-android@v3
+      - name: Setup Android SDK
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" "ndk;27.0.12077973" "cmake;3.22.1"
 
       - name: Install Android SDK
         run: |
