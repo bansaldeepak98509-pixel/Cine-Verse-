@@ -74,6 +74,11 @@ jobs:
           }
           PACKAGE
 
+      - name: Setup Node 18 runtime test
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
       - name: Debug Nitro server
         run: |
           NITRO_HOST=127.0.0.1 NITRO_PORT=3000 NODE_ENV=development node .output/server/index.mjs > /tmp/nitro.log 2>&1 &
