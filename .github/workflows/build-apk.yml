@@ -64,7 +64,18 @@ jobs:
           process.env.NITRO_HOST = '127.0.0.1';
           process.env.NITRO_PORT = '3000';
           process.env.NODE_ENV = 'development';
-          import('./index.mjs');
+
+          process.on('uncaughtException', (err) => {
+            console.error('[CineVerse uncaughtException]', err?.stack || err);
+          });
+
+          process.on('unhandledRejection', (err) => {
+            console.error('[CineVerse unhandledRejection]', err?.stack || err);
+          });
+
+          import('./index.mjs').catch((err) => {
+            console.error('[CineVerse server startup error]', err?.stack || err);
+          });
           LAUNCHER
 
           cat > dist/nodejs/package.json <<'PACKAGE'
