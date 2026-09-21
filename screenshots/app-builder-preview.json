@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "CineVerse",
+      "hasCanvas": false,
+      "bodyTextLen": 4967,
+      "bodyTextHash": "42013d1cadac51fa0f692c54071d1154d04a38623a198eec743162ba145365c1",
+      "bodyTextPrefix": "Skip to content CineVerse Home Search Movies Bollywood Free Upco",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "CineVerse",
+      "hasCanvas": false,
+      "bodyTextLen": 3311,
+      "bodyTextHash": "83f241cb23592464e0de28c2ffe138409a0252f18bbd096698aef1f744b5ddbe",
+      "bodyTextPrefix": "Skip to content CineVerse TRENDING TODAY 3 Idiots 2009 8.4 2h 50",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

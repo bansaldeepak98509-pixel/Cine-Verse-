@@ -1,0 +1,111 @@
+name: Build CineVerse APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Setup Android
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK
+        run: |
+          sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;27.0.12077973" "cmake;3.22.1"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Prepare PGlite assets
+        run: |
+          mkdir -p public
+          cp node_modules/@electric-sql/pglite/dist/pglite.wasm public/pglite.wasm
+          cp node_modules/@electric-sql/pglite/dist/initdb.wasm public/initdb.wasm
+          cp node_modules/@electric-sql/pglite/dist/pglite.data public/pglite.data
+
+      - name: Build Nitro server
+        run: |
+          cp vite.config.ts vite.config.node-test.ts
+          sed -i 's/preset: "vercel"/preset: "node"/' vite.config.node-test.ts
+          rm -rf .output dist
+          npx vite build --config vite.config.node-test.ts
+
+          cp public/pglite.wasm .output/server/_libs/pglite.wasm
+          cp public/initdb.wasm .output/server/_libs/initdb.wasm
+          cp public/pglite.data .output/server/_libs/pglite.data
+
+          mkdir -p dist/nodejs
+          cp -r .output/server/* dist/nodejs/
+
+          cat > dist/nodejs/launcher.cjs <<'LAUNCHER'
+          require('bridge');
+          process.env.NITRO_HOST = '127.0.0.1';
+          process.env.NITRO_PORT = '3000';
+          process.env.NODE_ENV = 'production';
+          import('./index.mjs');
+          LAUNCHER
+
+          cat > dist/nodejs/package.json <<'PACKAGE'
+          {
+            "name": "cineverse-server",
+            "version": "1.0.0",
+            "main": "launcher.cjs"
+          }
+          PACKAGE
+
+      - name: Create web loader
+        run: |
+          cat > dist/index.html <<'HTML'
+          <!doctype html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width,initial-scale=1">
+            <title>CineVerse</title>
+          </head>
+          <body style="margin:0;background:#0a0a0f;color:white">
+          <script>
+          const server='http://127.0.0.1:3000/';
+          async function start(){
+            try{
+              await fetch(server,{mode:'no-cors',cache:'no-store'});
+              location.replace(server);
+            }catch(e){
+              setTimeout(start,500);
+            }
+          }
+          start();
+          </script>
+          </body>
+          </html>
+          HTML
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Remove Termux AAPT2 setting
+        run: sed -i '/^android\.aapt2FromMavenOverride=/d' android/gradle.properties
+
+      - name: Build APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CineVerse-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
